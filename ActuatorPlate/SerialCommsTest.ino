@@ -14,6 +14,7 @@
 #include <ccsds_util.h>
 #include <SSC.h>
 
+int COMMAND = 0;
 uint8_t ReadData;
 int COMMAND_PIN = 0;
 #define COMMAND_PIN 6 
@@ -281,7 +282,8 @@ void setup(void)
     File IMULogFile = SD.open("IMU_LOG.txt", FILE_WRITE);
     File PWRLogFile = SD.open("PWR_LOG.txt", FILE_WRITE);
     File ENVLogFile = SD.open("ENV_LOG.txt", FILE_WRITE);
-
+    
+    pinMode(COMMAND_PIN, INPUT);
     pinMode(ACTUATOR_PIN_HBRIDGE_A, OUTPUT);
     pinMode(ACTUATOR_PIN_HBRIDGE_B, OUTPUT);
 
@@ -289,6 +291,7 @@ void setup(void)
     digitalWrite(ACTUATOR_PIN_HBRIDGE_B, LOW);
 
     armed = true;
+    delay(10000);
 }
 
 void loop(void)
@@ -338,6 +341,17 @@ void loop(void)
         // respond to it
     command_response(IMUData, ENVData, PWRData);
 
+  
+    COMMAND = digitalRead(COMMAND_PIN);
+    
+    
+    if (COMMAND == LOW){
+      delay(60);
+      COMMAND = digitalRead(COMMAND_PIN);
+          if (COMMAND == LOW){
+          retract(25);
+          }
+    }
 
 
 // wait a bit
